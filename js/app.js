@@ -19,9 +19,13 @@ const btnLogout = document.getElementById("btn-logout");
 const btnPwClose = document.getElementById("btn-pw-close");
 const btnPwSubmit = document.getElementById("btn-pw-submit");
 
-// 초기 세팅 (항상 로그인 화면에서 시작)
+// 앱 시작 시 무조건 로그인 화면으로 강제 초기화
 window.addEventListener("DOMContentLoaded", () => {
-  // 장소 탭 클릭 이벤트
+  // 기존에 저장된 유저 데이터 및 세션 완벽 삭제
+  localStorage.removeItem("mission_user");
+  currentUser = null;
+
+  // 장소 탭 클릭 이벤트 등록
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -32,7 +36,7 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// 로그인 제출
+// 로그인 제출 핸들러
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = document.getElementById("input-id").value.trim();
@@ -48,16 +52,25 @@ loginForm.addEventListener("submit", async (e) => {
   }
 });
 
-// 로그아웃 (다시 로그인 화면으로)
-btnLogout.addEventListener("click", () => {
-  currentUser = null;
-  completedMissions = [];
-  document.getElementById("input-password").value = "";
-  mainSection.classList.add("hidden");
-  loginSection.classList.remove("hidden");
-});
+// 로그아웃 버튼 핸들러 (강제 초기화 및 로그인 화면으로 이동)
+if (btnLogout) {
+  btnLogout.addEventListener("click", () => {
+    localStorage.clear();
+    currentUser = null;
+    completedMissions = [];
+    
+    // 입력 창 초기화
+    document.getElementById("input-id").value = "";
+    document.getElementById("input-name").value = "";
+    document.getElementById("input-password").value = "";
 
-// 메인 화면 표시 및 미션 로드
+    // 화면 전환
+    mainSection.classList.add("hidden");
+    loginSection.classList.remove("hidden");
+  });
+}
+
+// 메인 화면 표시 및 미션 데이터 로드
 async function showMainScreen() {
   loginSection.classList.add("hidden");
   mainSection.classList.remove("hidden");
@@ -66,7 +79,7 @@ async function showMainScreen() {
   document.getElementById("user-team-tag").innerText = `${currentUser.team}`;
   document.getElementById("user-score").innerText = currentUser.totalScore;
 
-  // 서버에서 미션 목록 불러오기
+  // 서버에서 미션 목록 가져오기
   const res = await apiGetMissions();
   if (res.success) {
     allMissions = res.missions;
@@ -79,11 +92,11 @@ async function showMainScreen() {
   }
 }
 
-// 미션 목록 동적 렌더링 (공백 문제 해결)
+// 미션 목록 동적 렌더링
 function renderMissions() {
   missionList.innerHTML = "";
   
-  // 장소 명칭 공백 및 대소문자 제거 비교 (미션 미출력 방지)
+  // 장소 명칭 공백 및 대소문자 무시 비교
   const targetLoc = currentLocation.replace(/\s+/g, "").toLowerCase();
   const filtered = allMissions.filter(m => {
     if (!m.location) return false;
@@ -116,7 +129,7 @@ function renderMissions() {
   });
 }
 
-// 미션 제출 모달 제어
+// 미션 제출 모달 창 제어
 function openMissionModal(missionId) {
   const mission = allMissions.find(m => m.missionId === missionId);
   if (!mission) return;

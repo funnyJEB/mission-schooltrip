@@ -10,18 +10,26 @@ const loginSection = document.getElementById("login-section");
 const mainSection = document.getElementById("main-section");
 const loginForm = document.getElementById("login-form");
 const missionList = document.getElementById("mission-list");
-const modal = document.getElementById("mission-modal");
+
+// 모달 요소 (미션 제출)
+const missionModal = document.getElementById("mission-modal");
+
+// 모달 요소 (비밀번호 변경)
+const pwModal = document.getElementById("pw-modal");
+const btnOpenPwModal = document.getElementById("btn-open-pw-modal");
+const btnPwClose = document.getElementById("btn-pw-close");
+const btnPwSubmit = document.getElementById("btn-pw-submit");
 
 // 앱 초기화
 window.addEventListener("DOMContentLoaded", () => {
-  // 로컬 스토리지 로그인 확인
+  // 로컬 스토리지 자동 로그인 확인
   const savedUser = localStorage.getItem("mission_user");
   if (savedUser) {
     currentUser = JSON.parse(savedUser);
     showMainScreen();
   }
-  
-  // 탭 클릭 이벤트
+
+  // 장소 탭 클릭 이벤트
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -37,8 +45,9 @@ loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = document.getElementById("input-id").value;
   const name = document.getElementById("input-name").value;
-  
-  const res = await apiLogin(id, name);
+  const password = document.getElementById("input-password").value;
+
+  const res = await apiLogin(id, name, password);
   if (res.success) {
     currentUser = res.student;
     localStorage.setItem("mission_user", JSON.stringify(currentUser));
@@ -52,7 +61,7 @@ loginForm.addEventListener("submit", async (e) => {
 async function showMainScreen() {
   loginSection.classList.add("hidden");
   mainSection.classList.remove("hidden");
-  
+
   document.getElementById("user-display").innerText = `${currentUser.id} ${currentUser.name}`;
   document.getElementById("user-team-tag").innerText = `${currentUser.team}`;
   document.getElementById("user-score").innerText = currentUser.totalScore;
@@ -92,7 +101,7 @@ function renderMissions() {
   });
 }
 
-// 미션 모달 창 열기
+// 1. 미션 모달 제어
 function openMissionModal(missionId) {
   const mission = allMissions.find(m => m.missionId === missionId);
   if (!mission) return;
@@ -101,15 +110,13 @@ function openMissionModal(missionId) {
   document.getElementById("modal-title").innerText = mission.title;
   document.getElementById("modal-desc").innerText = mission.description;
   document.getElementById("modal-answer").value = "";
-  modal.classList.remove("hidden");
+  missionModal.classList.remove("hidden");
 }
 
-// 모달 닫기
 document.getElementById("btn-modal-close").addEventListener("click", () => {
-  modal.classList.add("hidden");
+  missionModal.classList.add("hidden");
 });
 
-// 미션 정답 제출
 document.getElementById("btn-modal-submit").addEventListener("click", async () => {
   const answer = document.getElementById("modal-answer").value;
   if (!answer.trim()) {
@@ -123,10 +130,51 @@ document.getElementById("btn-modal-submit").addEventListener("click", async () =
     currentUser.totalScore = res.newScore;
     localStorage.setItem("mission_user", JSON.stringify(currentUser));
     document.getElementById("user-score").innerText = res.newScore;
-    
+
     completedMissions.push(activeMissionId);
-    modal.classList.add("hidden");
+    missionModal.classList.add("hidden");
     renderMissions();
+  } else {
+    alert(res.message);
+  }
+});
+
+// 2. 비밀번호 변경 모달 제어
+btnOpenPwModal.addEventListener("click", () => {
+  document.getElementById("input-curr-pw").value = "";
+  document.getElementById("input-new-pw").value = "";
+  document.getElementById("input-new-pw-confirm").value = "";
+  pwModal.classList.remove("hidden");
+});
+
+btnPwClose.addEventListener("click", () => {
+  pwModal.classList.add("hidden");
+});
+
+btnPwSubmit.addEventListener("click", async () => {
+  const currentPw = document.getElementById("input-curr-pw").value;
+  const newPw = document.getElementById("input-new-pw").value;
+  const newPwConfirm = document.getElementById("input-new-pw-confirm").value;
+
+  if (!currentPw || !newPw || !newPwConfirm) {
+    alert("모든 입력란을 작성해 주세요.");
+    return;
+  }
+
+  if (newPw !== newPwConfirm) {
+    alert("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+    return;
+  }
+
+  if (newPw.length < 4) {
+    alert("새 비밀번호는 최소 4자리 이상이어야 합니다.");
+    return;
+  }
+
+  const res = await apiChangePassword(currentUser.id, currentPw, newPw);
+  if (res.success) {
+    alert(res.message);
+    pwModal.classList.add("hidden");
   } else {
     alert(res.message);
   }

@@ -129,27 +129,47 @@ body {
   gap: 8px;
 }
 
-/* 개인정보 글자 크기 확대 */
+/* 개인정보 박스(개인정보 글자 크기 확대, 학번/이름 카드 배경 추가) */
 .user-name-box {
   display: flex;
   align-items: center;
   gap: 8px;
+  background: rgba(255, 255, 255, 0.85); /* 밝은 반투명 카드 배경 */
+  padding: 6px 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 #user-display {
-  font-size: 20px; /* 글씨 확대 */
+  font-size: 20px;
   font-weight: 800;
+  color: #1a365d; /* 가독성이 뛰어난 다크 블루-그레이 */
   letter-spacing: -0.5px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.user-team-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .badge {
-  background: #ffffff;
-  color: var(--primary);
-  padding: 3px 10px;
-  border-radius: 14px;
-  font-size: 13px;
+  background: var(--primary);
+  color: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%; /* 완전한 동그라미 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
   font-weight: 800;
+}
+
+.team-label {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1a365d;
 }
 
 .header-btns {
@@ -168,6 +188,22 @@ body {
   font-weight: 600;
 }
 
+/* 비밀번호 변경 버튼 (독립된 파스텔 블루 배색) */
+.btn-pw-change {
+  background: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #bee3f8;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-pw-change:hover {
+  background: #d4eee2;
+}
+
 .btn-logout {
   background: rgba(255, 107, 107, 0.3);
   border-color: rgba(255, 255, 255, 0.7);
@@ -176,23 +212,23 @@ body {
 /* 점수 표시 부분 */
 .score-box {
   text-align: right;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
   color: #ffffff;
-  background: rgba(0, 0, 0, 0.08);
-  padding: 8px 14px;
-  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  padding: 12px 18px;
+  border-radius: 16px;
 }
 
 .score-box .score {
-  font-size: 22px;
+  font-size: 36px;
   color: var(--accent-yellow);
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .score-box .score-total {
-  font-size: 18px;
-  opacity: 0.9;
+  font-size: 26px;
+  opacity: 0.95;
 }
 
 /* 3. 장소 탭 */

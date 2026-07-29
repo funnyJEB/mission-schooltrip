@@ -1,24 +1,23 @@
 // GAS 웹 앱 배포 URL (이곳에 복사한 URL을 붙여넣으세요)
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwJ6kdcSKwe0BUWzzBnyrUIZBSIIP0WWmc4lYThoNi4LuW5v1iSEtr0kMdKvvpb2i8X/exec";
 
-/**
- * 1. 학생 로그인 요청
- */
-async function apiLogin(studentId, studentName) {
+// 1. 학생 로그인 (비밀번호 인자 추가)
+async function apiLogin(studentId, studentName, password) {
   try {
     const response = await fetch(GAS_API_URL, {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" }, // GAS CORS 이슈 회피용
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         action: "login",
         studentId: studentId,
-        studentName: studentName
+        studentName: studentName,
+        password: password
       })
     });
     return await response.json();
   } catch (error) {
     console.error("Login API Error:", error);
-    return { success: false, message: "통신 중 오류가 발생했습니다. 네트워크를 확인해 주세요." };
+    return { success: false, message: "통신 중 오류가 발생했습니다." };
   }
 }
 
@@ -54,5 +53,25 @@ async function apiSubmitMission(studentId, missionId, answer) {
   } catch (error) {
     console.error("Submit API Error:", error);
     return { success: false, message: "제출 실패: 네트워크 상태를 확인하고 다시 시도해 주세요." };
+  }
+}
+
+// 4. 비밀번호 변경 요청 추가
+async function apiChangePassword(studentId, currentPassword, newPassword) {
+  try {
+    const response = await fetch(GAS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "changePassword",
+        studentId: studentId,
+        currentPassword: currentPassword,
+        newPassword: newPassword
+      })
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("ChangePassword API Error:", error);
+    return { success: false, message: "비밀번호 변경 처리 중 오류가 발생했습니다." };
   }
 }

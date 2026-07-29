@@ -1,1 +1,77 @@
-1
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>수학여행 자유 탐색 미션</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- 1. 로그인 화면 -->
+    <section id="login-section" class="screen">
+      <div class="login-card">
+        <h2>🧭 수학여행 미션 앱</h2>
+        <p>학번과 이름을 입력하여 시작하세요!</p>
+        <form id="login-form">
+          <input type="number" id="input-id" placeholder="학번 (예: 20101)" required>
+          <input type="text" id="input-name" placeholder="이름 (예: 홍길동)" required>
+          <button type="submit" id="btn-login">탐색 시작하기</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. 메인 대시보드 화면 -->
+    <section id="main-section" class="screen hidden">
+      <!-- 상단 프로필 및 점수 헤더 -->
+      <header class="user-header">
+        <div class="user-info">
+          <span id="user-display">20101 홍길동</span>
+          <span id="user-team-tag" class="badge">1조</span>
+        </div>
+        <div class="score-box">
+          <span class="label">내 점수</span>
+          <span id="user-score" class="score">0</span> 점
+        </div>
+      </header>
+
+      <!-- 장소 탭 (3개 장소) -->
+      <nav class="location-tabs">
+        <button class="tab-btn active" data-location="장소A">📍 장소 A</button>
+        <button class="tab-btn" data-location="장소B">📍 장소 B</button>
+        <button class="tab-btn" data-location="장소C">📍 장소 C</button>
+      </nav>
+
+      <!-- 미션 리스트 영역 -->
+      <main class="mission-list-container">
+        <div id="mission-list">
+          <!-- 미션 카드들이 JavaScript로 동적 추가됩니다 -->
+        </div>
+      </main>
+    </section>
+
+  </div>
+
+  <!-- 모달: 미션 제출 창 -->
+  <div id="mission-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="modal-title">미션 제목</h3>
+      <p id="modal-desc">미션 설명이 들어갑니다.</p>
+      
+      <div class="input-group">
+        <input type="text" id="modal-answer" placeholder="정답 또는 인증 내용을 입력하세요">
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-modal-close" class="btn-secondary">취소</button>
+        <button id="btn-modal-submit" class="btn-primary">제출하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 연결 -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

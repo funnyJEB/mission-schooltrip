@@ -76,7 +76,7 @@ async function showMainScreen() {
   mainSection.classList.remove("hidden");
 
   document.getElementById("user-display").innerText = `${currentUser.id} ${currentUser.name}`;
-  document.getElementById("user-team-tag").innerText = `${currentUser.team}`;
+  document.getElementById("user-team-tag").innerText = currentUser.team;
   document.getElementById("user-score").innerText = currentUser.totalScore;
 
   // 서버에서 미션 목록 가져오기

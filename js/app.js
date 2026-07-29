@@ -11,24 +11,16 @@ const mainSection = document.getElementById("main-section");
 const loginForm = document.getElementById("login-form");
 const missionList = document.getElementById("mission-list");
 
-// 모달 요소 (미션 제출)
+// 모달 요소
 const missionModal = document.getElementById("mission-modal");
-
-// 모달 요소 (비밀번호 변경)
 const pwModal = document.getElementById("pw-modal");
 const btnOpenPwModal = document.getElementById("btn-open-pw-modal");
+const btnLogout = document.getElementById("btn-logout");
 const btnPwClose = document.getElementById("btn-pw-close");
 const btnPwSubmit = document.getElementById("btn-pw-submit");
 
-// 앱 초기화
+// 초기 세팅 (항상 로그인 화면에서 시작)
 window.addEventListener("DOMContentLoaded", () => {
-  // 로컬 스토리지 자동 로그인 확인
-  const savedUser = localStorage.getItem("mission_user");
-  if (savedUser) {
-    currentUser = JSON.parse(savedUser);
-    showMainScreen();
-  }
-
   // 장소 탭 클릭 이벤트
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -40,21 +32,29 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// 로그인 이벤트
+// 로그인 제출
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const id = document.getElementById("input-id").value;
-  const name = document.getElementById("input-name").value;
-  const password = document.getElementById("input-password").value;
+  const id = document.getElementById("input-id").value.trim();
+  const name = document.getElementById("input-name").value.trim();
+  const password = document.getElementById("input-password").value.trim();
 
   const res = await apiLogin(id, name, password);
   if (res.success) {
     currentUser = res.student;
-    localStorage.setItem("mission_user", JSON.stringify(currentUser));
     showMainScreen();
   } else {
     alert(res.message);
   }
+});
+
+// 로그아웃 (다시 로그인 화면으로)
+btnLogout.addEventListener("click", () => {
+  currentUser = null;
+  completedMissions = [];
+  document.getElementById("input-password").value = "";
+  mainSection.classList.add("hidden");
+  loginSection.classList.remove("hidden");
 });
 
 // 메인 화면 표시 및 미션 로드
@@ -66,21 +66,36 @@ async function showMainScreen() {
   document.getElementById("user-team-tag").innerText = `${currentUser.team}`;
   document.getElementById("user-score").innerText = currentUser.totalScore;
 
-  // 서버에서 미션목록 가져오기
+  // 서버에서 미션 목록 불러오기
   const res = await apiGetMissions();
   if (res.success) {
     allMissions = res.missions;
+    
+    // 전체 총점 계산하여 분모에 표시
+    const maxScore = allMissions.reduce((acc, cur) => acc + (Number(cur.points) || 0), 0);
+    document.getElementById("total-possible-score").innerText = maxScore;
+
     renderMissions();
   }
 }
 
-// 미션 목록 동적 렌더링
+// 미션 목록 동적 렌더링 (공백 문제 해결)
 function renderMissions() {
   missionList.innerHTML = "";
-  const filtered = allMissions.filter(m => m.location === currentLocation);
+  
+  // 장소 명칭 공백 및 대소문자 제거 비교 (미션 미출력 방지)
+  const targetLoc = currentLocation.replace(/\s+/g, "").toLowerCase();
+  const filtered = allMissions.filter(m => {
+    if (!m.location) return false;
+    return String(m.location).replace(/\s+/g, "").toLowerCase() === targetLoc;
+  });
 
   if (filtered.length === 0) {
-    missionList.innerHTML = `<p style="text-align:center; padding: 20px; color:#a0aec0;">해당 장소에 등록된 미션이 없습니다.</p>`;
+    missionList.innerHTML = `
+      <div style="text-align:center; padding: 40px 20px; color:#a0aec0;">
+        <p style="font-size:32px; margin-bottom:8px;">🏜️</p>
+        <p>등록된 미션이 없습니다.</p>
+      </div>`;
     return;
   }
 
@@ -101,7 +116,7 @@ function renderMissions() {
   });
 }
 
-// 1. 미션 모달 제어
+// 미션 제출 모달 제어
 function openMissionModal(missionId) {
   const mission = allMissions.find(m => m.missionId === missionId);
   if (!mission) return;
@@ -118,8 +133,8 @@ document.getElementById("btn-modal-close").addEventListener("click", () => {
 });
 
 document.getElementById("btn-modal-submit").addEventListener("click", async () => {
-  const answer = document.getElementById("modal-answer").value;
-  if (!answer.trim()) {
+  const answer = document.getElementById("modal-answer").value.trim();
+  if (!answer) {
     alert("정답 또는 입력값을 작성해 주세요.");
     return;
   }
@@ -128,7 +143,6 @@ document.getElementById("btn-modal-submit").addEventListener("click", async () =
   if (res.success) {
     alert(`🎉 미션 성공! +${res.pointsAdded}점을 획득했습니다.`);
     currentUser.totalScore = res.newScore;
-    localStorage.setItem("mission_user", JSON.stringify(currentUser));
     document.getElementById("user-score").innerText = res.newScore;
 
     completedMissions.push(activeMissionId);
@@ -139,7 +153,7 @@ document.getElementById("btn-modal-submit").addEventListener("click", async () =
   }
 });
 
-// 2. 비밀번호 변경 모달 제어
+// 비밀번호 변경 모달 제어
 btnOpenPwModal.addEventListener("click", () => {
   document.getElementById("input-curr-pw").value = "";
   document.getElementById("input-new-pw").value = "";
@@ -152,9 +166,9 @@ btnPwClose.addEventListener("click", () => {
 });
 
 btnPwSubmit.addEventListener("click", async () => {
-  const currentPw = document.getElementById("input-curr-pw").value;
-  const newPw = document.getElementById("input-new-pw").value;
-  const newPwConfirm = document.getElementById("input-new-pw-confirm").value;
+  const currentPw = document.getElementById("input-curr-pw").value.trim();
+  const newPw = document.getElementById("input-new-pw").value.trim();
+  const newPwConfirm = document.getElementById("input-new-pw-confirm").value.trim();
 
   if (!currentPw || !newPw || !newPwConfirm) {
     alert("모든 입력란을 작성해 주세요.");
@@ -162,7 +176,7 @@ btnPwSubmit.addEventListener("click", async () => {
   }
 
   if (newPw !== newPwConfirm) {
-    alert("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+    alert("새 비밀번호가 서로 일치하지 않습니다.");
     return;
   }
 

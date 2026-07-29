@@ -12,13 +12,14 @@
     <!-- 1. 로그인 화면 -->
     <section id="login-section" class="screen">
       <div class="login-card">
-        <h2>🧭 수학여행 미션 앱</h2>
-        <p>학번, 이름, 비밀번호를 입력하여 시작하세요!</p>
+        <div class="app-badge">🌱 현장체험학습</div>
+        <h2>수학여행 미션 탐색</h2>
+        <p>학번, 이름, 비밀번호를 입력해 주세요.</p>
         <form id="login-form">
           <input type="number" id="input-id" placeholder="학번 (예: 20101)" required>
           <input type="text" id="input-name" placeholder="이름 (예: 홍길동)" required>
           <input type="password" id="input-password" placeholder="비밀번호 (초기: 1234)" required>
-          <button type="submit" id="btn-login">탐색 시작하기</button>
+          <button type="submit" id="btn-login">탐색 시작하기 🚀</button>
         </form>
       </div>
     </section>
@@ -28,15 +29,17 @@
       <!-- 상단 프로필 및 점수 헤더 -->
       <header class="user-header">
         <div class="user-info">
-          <div>
+          <div class="user-name-box">
             <span id="user-display">20101 홍길동</span>
             <span id="user-team-tag" class="badge">1조</span>
           </div>
-          <button id="btn-open-pw-modal" class="btn-sm">비밀번호 변경</button>
+          <div class="header-btns">
+            <button id="btn-open-pw-modal" class="btn-sm">비밀번호 변경</button>
+            <button id="btn-logout" class="btn-sm btn-logout">로그아웃</button>
+          </div>
         </div>
         <div class="score-box">
-          <span class="label">내 점수</span>
-          <span id="user-score" class="score">0</span> 점
+          [ <span id="user-score" class="score">0</span> / <span id="total-possible-score" class="score-total">0</span> 점 ]
         </div>
       </header>
 
@@ -78,7 +81,7 @@
   <div id="pw-modal" class="modal hidden">
     <div class="modal-content">
       <h3>🔒 비밀번호 변경</h3>
-      <p>보안을 위해 초기 비밀번호(1234)를 변경해 주세요.</p>
+      <p>초기 비밀번호(1234)를 본인만의 비밀번호로 바꿔주세요.</p>
       
       <div class="input-group">
         <input type="password" id="input-curr-pw" placeholder="현재 비밀번호">

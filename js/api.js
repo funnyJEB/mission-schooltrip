@@ -2,7 +2,7 @@
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwJ6kdcSKwe0BUWzzBnyrUIZBSIIP0WWmc4lYThoNi4LuW5v1iSEtr0kMdKvvpb2i8X/exec";
 
 /**
- * 1. 학생 로그인 요청 (비밀번호 포함)
+ * 1. 학생 로그인 요청
  */
 async function apiLogin(studentId, studentName, password) {
   try {

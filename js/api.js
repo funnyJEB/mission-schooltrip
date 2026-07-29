@@ -1,5 +1,5 @@
 // GAS 웹 앱 배포 URL (이곳에 복사한 URL을 붙여넣으세요)
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwh-kUJUkJzolarvA9UEdId36oHG5VknjKMtgzTsTqRDwp2TCOqoNUDFv9PtyuK3vtC/exec";
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwJ6kdcSKwe0BUWzzBnyrUIZBSIIP0WWmc4lYThoNi4LuW5v1iSEtr0kMdKvvpb2i8X/exec";
 
 /**
  * 1. 학생 로그인 요청

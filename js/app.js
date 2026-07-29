@@ -96,18 +96,29 @@ async function showMainScreen() {
 function renderMissions() {
   missionList.innerHTML = "";
   
-  // 장소 명칭 공백 및 대소문자 무시 비교
-  const targetLoc = currentLocation.replace(/\s+/g, "").toLowerCase();
+  if (!allMissions || allMissions.length === 0) {
+    missionList.innerHTML = `
+      <div style="text-align:center; padding: 40px 20px; color:#a0aec0;">
+        <p style="font-size:32px; margin-bottom:8px;">📡</p>
+        <p>미션 데이터를 불러오는 중이거나 없습니다.</p>
+      </div>`;
+    return;
+  }
+
+  // 선택된 탭의 장소명과 시트의 장소명 비교 (공백, 특수문자, 대소문자 무시)
+  const cleanTargetLoc = currentLocation.replace(/[^a-zA-Z0-9가-힣]/g, "").toLowerCase();
+
   const filtered = allMissions.filter(m => {
     if (!m.location) return false;
-    return String(m.location).replace(/\s+/g, "").toLowerCase() === targetLoc;
+    const cleanSheetLoc = String(m.location).replace(/[^a-zA-Z0-9가-힣]/g, "").toLowerCase();
+    return cleanSheetLoc === cleanTargetLoc;
   });
 
   if (filtered.length === 0) {
     missionList.innerHTML = `
       <div style="text-align:center; padding: 40px 20px; color:#a0aec0;">
         <p style="font-size:32px; margin-bottom:8px;">🏜️</p>
-        <p>등록된 미션이 없습니다.</p>
+        <p>'${currentLocation}'에 등록된 미션이 없습니다.</p>
       </div>`;
     return;
   }
